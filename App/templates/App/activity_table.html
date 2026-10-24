@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tabla de Incidencias por Actividad y Territorio</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'App/assets/bootstrap/css/bootstrap.min.css' %}">
+    <style>
+        table {
+            text-align: center;
+            border-collapse: collapse;
+            width: 90%;
+            margin: 20px auto;
+            margin-bottom: 40px;
+            /* Remove page-break-after to avoid cutting tables */
+            page-break-after: auto;
+            /* Prevent page breaks inside tables */
+            page-break-inside: avoid;
+            -webkit-page-break-inside: avoid;
+            -moz-page-break-inside: avoid;
+        }
+        /* Add page break before second table */
+        table:nth-of-type(2) {
+            page-break-before: always;
+        }
+        th, td {
+            border: 1px solid #000 !important;
+            padding: 8px 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #eee;
+        }
+        td:first-child {
+            text-align: left;
+            font-weight: bold;
+        }
+        h4 {
+            text-align: center;
+            margin-top: 40px;
+        }
+        tr td:last-child {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        /* Para th en la última columna (si es una cabecera) */
+        tr th:last-child {
+            border-right: 2px solid #000 !important;
+            width: 60px !important;
+        }
+    </style>
+</head>
+<header>
+   
+</header>
+<body >
+    <section class="container" >
+    <h2 style="text-align:center;">Incidencias por Actividad y Territorio</h2>
+
+    <h4>Actividades Contrarevolucionarias</h4>
+    <table style="border-collapse: collapse; width: 90%; margin: 20px auto; margin-bottom: 40px; page-break-after: auto; page-break-inside: avoid;">
+        <thead>
+            <tr>
+                <th style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: center;">No.</th>
+                <th style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: center;">Actividad</th>
+                {% for territory in territories %}
+                <th style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: center; width: 160px;">{{ territory }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for activity in counterrevolution_activities %}
+            <tr>
+                <td style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: center;">{{ forloop.counter }}</td>
+                <td style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: left; font-weight: 700;">{{ activity }}</td>
+                {% for territory in territories %}
+                {% for item in counts_list %}
+                    {% if item.activity == activity and item.territory == territory %}
+                        <td style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: center;">{% if item.count == 0 %}
+                            - 
+                            {% else %}
+                            {{ item.count }}
+                            {% endif %}
+                        </td>
+                    {% endif %}
+                {% endfor %}
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td></td>
+                <td style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: center; font-weight: 700;">Total</td>
+                <td style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: center;">{{counterrevolution_mayabeque_count}}</td>
+                <td style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: center;">{{counterrevolution_havana_count}}</td>
+                <td style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: center;">{{counterrevolution_artemisa_count}}</td>
+                <td style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: center;">{{counterrevolution_pinar_count}}</td>
+                <td style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: center;">{{counterrevolution_isle_count}}</td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <h4>Actividades Delictivas</h4>
+    <table class="table table-sm border "  >
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th  >Actividad</th>
+                {% for territory in territories %}
+                <th class="text-center border" style="width: 160px;">{{ territory }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for activity in criminal_activities %}
+            <tr>
+                <td class="border" >{{ forloop.counter }}</td>
+                <td class="border" >{{ activity }}</td>
+                {% for territory in territories %}
+                {% for item in counts_list %}
+                    {% if item.activity == activity and item.territory == territory %}
+                        
+                    <td class="text-center border" >{% if item.count == 0  %}
+                            - 
+                            {% else %}
+                            {{ item.count }}
+                            {% endif %}</td>
+                    {% endif %}
+                {% endfor %}
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot class="border" >
+            <tr>
+                <td></td>
+                <td>Total</td>
+                <td class="text-center border" > {{criminal_mayabeque_count}} </td>
+                <td class="text-center border" >{{criminal_havana_count}} </td>
+                <td class="text-center border" >{{criminal_artemisa_count}} </td>
+                <td class="text-center border" >{{criminal_pinar_count}} </td>
+                <td class="text-center border" >{{criminal_isle_count}} </td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+    </section>
+    <section class="container" style="text-align:center; margin-bottom: 40px;">
+        <a href="{% url 'generate_activity_table_image' %}" class="btn btn-primary" target="_blank" style="margin-top: 20px;">
+            Generar Imagen
+        </a>
+    </section>
+</body>
+</html>

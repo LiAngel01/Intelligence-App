@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Usuario</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'App/css/bootstrap.min.css' %}">
+    <style>
+        .card {
+            max-width: 60%;
+            margin: 2rem auto;
+            background-color: transparent;
+        }
+        .card-body {
+            padding: 1.5rem;
+        }
+        form {
+            margin-bottom: 0;
+        }
+        .form-control {
+            background-color: rgba(87, 87, 87, 0.4) !important;
+            color: aliceblue !important;
+            font-weight: 500;
+        }
+        body {
+            background: url({% static 'App/img/fondo.jpg' %}) center / cover no-repeat;
+            background-attachment: fixed;
+            color: white;
+        }
+        #id_password, span {
+            display: none;
+        }
+        /* Messages styling */
+        .messages {
+            list-style-type: none;
+            padding: 0;
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            z-index: 1000;
+        }
+        .messages li {
+            list-style-type: none;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 35px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.5s ease, opacity 0.5s ease;
+            transform: translateX(-50%);
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .hide {
+            transform: translateX(100%) !important;
+            opacity: 0;
+        }
+        option{
+        background-color: #1e1f1f;
+    }
+    </style>
+</head>
+<body class="text-light">
+    {% if messages %}
+    <div class="notification text-center">
+        <ul class="messages" data-aos="fade-down" data-aos-duration="1600">
+            {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+                {% if message.tags == 'success' %}
+                <svg xmlns="http://www.w3.org/2000/svg" width="25px" height="25px" viewBox="0 0 24 24" fill="none" stroke="green" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 6L9 17l-5-5"/>
+                </svg>
+                {{ message }}
+                {% elif message.tags == 'error' %}
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="6" y1="18" x2="18" y2="6"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+                {{ message }}
+                {% else %}
+                {{ message }}
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    <div class="container">
+        <h1 class="text-center mt-4">Agregar Nuevo Usuario</h1>
+        <div class="card">
+            <div class="card-body">
+                <form method="post" class="mx-auto text-center" style="width: 100%; background-color: transparent;">
+                    {% csrf_token %}
+                    <div class="row mb-3">
+                        <div class="col">
+                            {{ form.username.label_tag }}
+                            {{ form.username }}
+                        </div>
+                        <div class="col">
+                            {{ form.first_name.label_tag }}
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col">
+                            {{ form.last_name.label_tag }}
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            {{ form.identity_number.label_tag }}
+                            {{ form.identity_number }}
+                        </div>
+                        <div class="col">
+                            {{ form.role.label_tag }}
+                            {{ form.role }}
+                        </div>
+                        <div class="col">
+                            {{ form.region.label_tag }}
+                            {{ form.region }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            {{ form.email.label_tag }}
+                            {{ form.email }}
+                        </div>
+                        <div class="col">
+                            {{ form.password1.label_tag }}
+                            {{ form.password1 }}
+                        </div>
+                        <div class="col">
+                            {{ form.password2.label_tag }}
+                            {{ form.password2 }}
+                        </div>
+
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <button type="submit" class="btn btn-success">Guardar</button>
+                            <a href="{% url 'list_users' %}" class="btn btn-secondary">Cancelar</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div>
+        
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const messages = document.querySelectorAll('.messages li');
+        messages.forEach((message) => {
+            setTimeout(() => {
+                message.classList.add('hide');
+            }, 3000);
+            message.addEventListener('transitionend', () => {
+                message.remove();
+            });
+        });
+    });
+    </script>
+</body>
+</html>

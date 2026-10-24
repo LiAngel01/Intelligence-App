@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Detalles de Incidencia</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'App/css/bootstrap.min.css' %}" />
+</head>
+ {% if messages %}
+       <div class="notification text-center">
+           <ul class="messages " data-aos="fade-down" data-aos-duration="1600">
+               {% for message in messages %}
+                   <li{% if message.tags %} class="{{ message.tags }}"{% endif %}> 
+                       {% if message.tags == 'success' %}
+                       <svg xmlns="http://www.w3.org/2000/svg" width="25px" height="25px" viewBox="0 0 24 24" fill="none" stroke="green" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 6L9 17l-5-5"/>
+                       </svg>
+                       {{ message }}
+
+                       {% elif message.tags == 'error' %}
+                       <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="6" y1="18" x2="18" y2="6"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                       </svg>
+                     {{ message }}
+                     
+                       {% else %}
+                           {{ message }}
+                       {% endif %}
+                   </li>
+               {% endfor %}
+           </ul>
+       </div>
+   {% endif %}
+ <style>
+    body {
+        position: relative; /* Necesario para que los elementos absolutos se posicionen respecto al body */
+       
+       
+        
+    }
+    
+    .messages {
+        list-style-type: none;
+        padding: 0;
+        position: absolute; /* Posiciona las notificaciones de forma absoluta */
+        top: 5px; /* Distancia desde la parte superior */
+        /* right: 20px; Distancia desde la derecha */
+        left: 50%;/*  Centra horizontalmente */
+        
+        z-index: 1000; /* Asegura que esté por encima de otros elementos */
+        
+    }
+    
+    .messages li { 
+        list-style-type: none;
+        padding: 10px;
+        margin: 5px 0;
+        border-radius: 35px;
+        box-shadow:  0 2px 4px rgba(0, 0, 0, 0.4), 
+               0 4px 8px rgba(0, 0, 0, 0.3); /* S
+        transition: transform 0.5s ease, opacity 0.5s ease; /* Agrega la transición */
+        transform: translateX(-50%);
+    }
+    
+    .success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    
+    
+    /* Clase para ocultar el mensaje */
+    .hide {
+        transform: translateX(100%) !important; /* Desliza hacia la derecha */
+        opacity: 0; /* Desvanece */
+    }
+ </style>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const messages = document.querySelectorAll('.messages li');
+        
+        messages.forEach((message) => {
+            setTimeout(() => {
+                message.classList.add('hide'); // Agrega la clase para ocultar
+            }, 3000); // Espera 3 segundos antes de ocultar
+            
+            // Opcional: Eliminar el elemento del DOM después de la animación
+            message.addEventListener('transitionend', () => {
+                message.remove();
+            });
+        });
+    });
+</script>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">Detalles de Incidencia</h1>
+        <div class="card">
+            <div class="card-body">
+                <a href="{% url 'incident_list' %}" class="m-3 btn btn-secondary">Volver al listado</a>
+                <dl class="row">
+                     
+                    
+
+                    <dt class="col-sm-3">Fecha Incidencia</dt>
+                    <dd class="col-sm-9">{{ incident.incident_date }}</dd>
+
+                    <dt class="col-sm-3">Fecha Registro</dt>
+                    <dd class="col-sm-9">{{ incident.created_at }}</dd>
+
+                    <dt class="col-sm-3">Informante</dt>
+                    <dd class="col-sm-9">{{ incident.informant }}</dd>
+
+                    <dt class="col-sm-3">Tipo de Actividad</dt>
+                    <dd class="col-sm-9">{{ incident.activity_type }}</dd>
+
+                    <dt class="col-sm-3">Actividades</dt>
+                    <dd class="col-sm-9">{{ incident.activities }}</dd>
+
+                    <dt class="col-sm-3">Territorio</dt>
+                    <dd class="col-sm-9">{{ incident.territory }}</dd>
+
+                    <dt class="col-sm-3">Implicado</dt>
+                    <dd class="col-sm-9">{{ incident.involved_parties }}</dd>
+
+                    <dt class="col-sm-3">Ampliación</dt>
+                    <dd class="col-sm-9">{{ incident.additional_details }}</dd>
+
+                    {% if incident.imagen %}
+                    <dt class="col-sm-3">Imagen</dt>
+                    <dd class="col-sm-9">
+                     <div style="height: 700px;width: 700px;" > <img src="{{ incident.imagen.url }}" alt="" srcset="" width="700" height="700" >
+                    </div></dd>
+                    {% endif %}
+                </dl>
+                
+            </div>
+        </div>
+    </div>
+</body>
+</html>

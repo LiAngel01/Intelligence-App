@@ -1,0 +1,667 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Inteligencia</title>
+    <link rel="stylesheet" href="{% static 'App/assets/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&amp;display=swap">
+    <link rel="stylesheet" href="{% static 'App/assets/css/aos.min.css' %}">
+    <link rel="stylesheet" href="{% static 'App/assets/css/Features-Centered-Icons-icons.css' %}">
+    <link rel="stylesheet" href="{% static 'App/css/bootstrap.min.css' %}">
+</head>
+<style>
+    h2{
+        color: aliceblue;
+    }
+    h4,p{
+        color: aliceblue;
+        font-size: larger;
+        font-weight: 600;
+    }
+</style>
+
+ 
+<body class="text-light" style="background: url({% static 'App/img/fondo.jpg' %}) center / cover no-repeat;background-attachment: fixed;">
+    <nav class="navbar navbar-light navbar-expand-md py-3">
+        <div class="container">
+            <a class="navbar-brand text-light" href="{% url 'dashboard' %}">Inicio</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample02" aria-controls="navbarsExample02" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarsExample02">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link text-light" aria-current="page" href="{% url 'list_users' %}">Usuarios</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-light" href="{% url 'incident_list' %}">Registro</a>
+          </li>
+        </ul>
+        
+      </div><div class="text-light">
+            {% if request.user.is_authenticated %}
+            <form action="{% url 'logout' %}" method="post">
+           {% csrf_token %}
+           <span> @{{ user.username }}/ {{user.role}} </span>
+            <button class=" btn btn-primary" type="submit">Cerrar sesión</button>
+           </form> 
+           {% else %}
+           
+           <a href="{% url 'login' %}" class="btn btn-primary" >Iniciar Sesión</a>
+            {% endif %}
+        </div>
+            </div>
+        </div>
+    </nav>
+     {% if messages %}
+       <div class="notification text-center">
+           <ul class="messages " data-aos="fade-down" data-aos-duration="1600">
+               {% for message in messages %}
+                   <li{% if message.tags %} class="{{ message.tags }}"{% endif %}> 
+                       {% if message.tags == 'success' %}
+                       <svg xmlns="http://www.w3.org/2000/svg" width="25px" height="25px" viewBox="0 0 24 24" fill="none" stroke="green" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 6L9 17l-5-5"/>
+                       </svg>
+                       {{ message }}
+
+                       {% elif message.tags == 'error' %}
+                       <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="6" y1="18" x2="18" y2="6"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                       </svg>
+                     {{ message }}
+                     
+                       {% else %}
+                           {{ message }}
+                       {% endif %}
+                   </li>
+               {% endfor %}
+           </ul>
+       </div>
+   {% endif %}
+ <style>
+    body {
+        position: relative; /* Necesario para que los elementos absolutos se posicionen respecto al body */
+       
+       
+        
+    }
+    
+    .messages {
+        list-style-type: none;
+        padding: 0;
+        position: absolute; /* Posiciona las notificaciones de forma absoluta */
+        top: 5px; /* Distancia desde la parte superior */
+        /* right: 20px; Distancia desde la derecha */
+        left: 50%;/*  Centra horizontalmente */
+        
+        z-index: 1000; /* Asegura que esté por encima de otros elementos */
+        
+    }
+    
+    .messages li { 
+        list-style-type: none;
+        padding: 10px;
+        margin: 5px 0;
+        border-radius: 35px;
+        box-shadow:  0 2px 4px rgba(0, 0, 0, 0.4), 
+               0 4px 8px rgba(0, 0, 0, 0.3); /* S
+        transition: transform 0.5s ease, opacity 0.5s ease; /* Agrega la transición */
+        transform: translateX(-50%);
+    }
+    
+    .success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    
+    
+    /* Clase para ocultar el mensaje */
+    .hide {
+        transform: translateX(100%) !important; /* Desliza hacia la derecha */
+        opacity: 0; /* Desvanece */
+    }
+ </style>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const messages = document.querySelectorAll('.messages li');
+        
+        messages.forEach((message) => {
+            setTimeout(() => {
+                message.classList.add('hide'); // Agrega la clase para ocultar
+            }, 3000); // Espera 3 segundos antes de ocultar
+            
+            // Opcional: Eliminar el elemento del DOM después de la animación
+            message.addEventListener('transitionend', () => {
+                message.remove();
+            });
+        });
+    });
+</script>
+
+
+    <section   style="background: linear-gradient(var(--bs-body-bg) 0%, black 100%);"></section>
+    <div class="container py-4 py-xl-5" style="color: rgb(0,0,0);">
+        <div class="row mb-5">
+            <div class="col-md-8 col-xl-6 text-center mx-auto" style="color: rgb(0,0,0);">
+                <h2>Bienvenido</h2>
+                <p>Tarea Automatizada Para el Registro, Procesamiento y Tramitación de la Información de Inteligencia Militar en el Territorio del Ejército Occidental.</p>
+            </div>
+        </div>
+        <div class="row gy-4 row-cols-1 row-cols-md-2 row-cols-xl-3" style="font-weight: bold;color: rgb(255,255,255);">
+            <div class="col">
+                <div class="text-center d-flex flex-column align-items-center align-items-xl-center">
+                  <a href="#" data-bs-target="#modal-Parte" data-bs-toggle="modal" class="btn  text-light" >  <div class="bs-icon-lg bs-icon-rounded bs-icon-primary d-flex flex-shrink-0 justify-content-center align-items-center d-inline-block mb-3 bs-icon" data-aos="zoom-in" data-aos-duration="800"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-journal-bookmark">
+                           <path fill-rule="evenodd" d="M6 8V1h1v6.117L8.743 6.07a.5.5 0 0 1 .514 0L11 7.117V1h1v7a.5.5 0 0 1-.757.429L9 7.083 6.757 8.43A.5.5 0 0 1 6 8z"></path>
+                            <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2z"></path>
+                            <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1z"></path>
+                        </svg></div>
+                    <div data-aos="slide-up" data-aos-duration="800" class="px-3" style="color: rgb(0,0,0);">
+                        <h4>Generar Parte</h4></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="text-center d-flex flex-column align-items-center align-items-xl-center">
+                    <a href="{% url 'add_incidence' %}" class="btn  text-light"><div class="bs-icon-lg bs-icon-rounded bs-icon-primary d-flex flex-shrink-0 justify-content-center align-items-center d-inline-block mb-3 bs-icon" data-aos="zoom-in" data-aos-duration="800"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-capslock">
+                            <path fill-rule="evenodd" d="M7.27 1.047a1 1 0 0 1 1.46 0l6.345 6.77c.6.638.146 1.683-.73 1.683H11.5v1a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-1H1.654C.78 9.5.326 8.455.924 7.816L7.27 1.047zM14.346 8.5 8 1.731 1.654 8.5H4.5a1 1 0 0 1 1 1v1h5v-1a1 1 0 0 1 1-1h2.846zm-9.846 5a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-1zm6 0h-5v1h5v-1z"></path>
+                        </svg></div>
+                    <div data-aos="slide-up" data-aos-duration="800" class="px-3" style="color: rgb(0,0,0);">
+                        <h4>Añadir Incidencia</h4></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="text-center d-flex flex-column align-items-center align-items-xl-center">
+                    <a href="{% url 'activity_table' %}" class="btn text-light"><div class="bs-icon-lg bs-icon-rounded bs-icon-primary d-flex flex-shrink-0 justify-content-center align-items-center d-inline-block mb-3 bs-icon" data-aos="zoom-in" data-aos-duration="800"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-table">
+                            <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm15 2h-4v3h4V4zm0 4h-4v3h4V8zm0 4h-4v3h3a1 1 0 0 0 1-1v-2zm-5 3v-3H6v3h4zm-5 0v-3H1v2a1 1 0 0 0 1 1h3zm-4-4h4V8H1v3zm0-4h4V4H1v3zm5-3v3h4V4H6zm4 4H6v3h4V8z"></path>
+                        </svg></div>
+                    <div data-aos="slide-up" data-aos-duration="800" class="px-3" style="color: rgb(0,0,0);">
+                        <h4>Tabla 1</h4></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4"> </div>
+        <div class="col-4"><div class="text-center d-flex flex-column align-items-center align-items-xl-center">
+                    <a href="#" data-bs-target="#modal-Oincidencia" data-bs-toggle="modal" class="btn text-light" >
+                        <div class="bs-icon-lg bs-icon-rounded bs-icon-primary d-flex flex-shrink-0 justify-content-center align-items-center d-inline-block mb-3 bs-icon" data-aos="zoom-in" data-aos-duration="800"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-table">
+                            <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm15 2h-4v3h4V4zm0 4h-4v3h4V8zm0 4h-4v3h3a1 1 0 0 0 1-1v-2zm-5 3v-3H6v3h4zm-5 0v-3H1v2a1 1 0 0 0 1 1h3zm-4-4h4V8H1v3zm0-4h4V4H1v3zm5-3v3h4V4H6zm4 4H6v3h4V8z"></path>
+                        </svg></div>
+                     <div data-aos="slide-up" data-aos-duration="800" class="px-3" style="color: rgb(0,0,0);">
+                        <h4>Otras incidencias</h4></a>
+                    </div>
+                </div></div>
+        <div class="col-4"></div>
+    </div>
+    <div class="modal fade" role="dialog" tabindex="-1" id="modal-Parte">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" style="font-size: 22px;">Introduzca el rango de fechas para el Parte</h4><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body d-xl-flex justify-content-xl-center">
+                    <form method="get" action="{% url 'generate_report' %}" style="width: 360px;">
+                        <div class="mb-3"><input class="form-control" type="date" name="fecha_incidencia_start"></div>
+                        <div class="mb-3"><input class="form-control" type="date" name="fecha_incidencia_end"></div>
+                        <div class="mb-3"><button class="btn btn-primary" type="submit">Generar</button></div>
+                    </form>
+                </div>
+                <div class="modal-footer"><button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancelar</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade text-dark" role="dialog" tabindex="-1" id="modal-Oincidencia">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" style="font-size: 22px;color: black;">Introduzca los datos</h4><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body d-xl-flex justify-content-xl-center">
+                    <form method="post" action="{% url 'add_other_incidence' %}" style="width: 460px;">
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <div class="col-6">
+                                <label for="fecha"> Fecha </label>
+                                {{form.incident_date}}</div>
+                            <div class="col-6">
+                                <label for="hora"> Hora </label>
+                                {{form.incident_time}}</div>
+                        </div>
+                        <br>
+                        <label for="description"> Descripción </label>
+                        {{form.description}}
+                        <br>
+                        
+                        <div class="mb-3"><button class="btn btn-primary" type="submit" >Guardar</button></div>
+                    </form>
+                </div>
+                <div class="modal-footer"><button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancelar</button></div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <section class="" style="margin-top: 200px;" >
+        <div class="container-fluid">
+        <div class="d-sm-flex justify-content-between align-items-center justify-content-xl-center mb-4">
+            <h1 class="mb-0" style="color: rgb(247,251,255);">ESTADÍSTICAS</h1>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-xl-3 mb-4">
+                <div class="card shadow border-start-primary py-2" style="background: rgba(255,255,255,0.83);color: var(--bs-black);">
+                    <div class="card-body">
+                        <div class="row align-items-center no-gutters">
+                            <div class="col me-2">
+                                <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>TOTAL Incidencias</span></div>
+                                <div class="text-dark fw-bold h5 mb-0"><span>{{total}}</span></div>
+                            </div>
+                            <div class="col-auto"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-reception-4 fa-2x text-gray-300">
+                                    <path d="M0 11.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2zm4-3a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-5zm4-3a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-8zm4-3a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-11z"></path>
+                                </svg></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3 mb-4">
+                <div class="card shadow border-start-success py-2" style="background: rgba(255,255,255,0.83);color: var(--bs-black);">
+                    <div class="card-body">
+                        <div class="row align-items-center no-gutters">
+                            <div class="col me-2">
+                                <div class="text-uppercase text-success fw-bold text-xs mb-1"><span>Región de Riesgo</span></div>
+                                <div class="text-dark fw-bold h5 mb-0"><span>{{top_territory}}</span></div>
+                            </div>
+                            <div class="col-auto"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-star-fill fa-2x text-gray-300">
+                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"></path>
+                                </svg></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3 mb-4">
+                <div class="card shadow border-start-info py-2" style="background: rgba(255,255,255,0.83);color: var(--bs-black);">
+                    <div class="card-body">
+                        <div class="row align-items-center no-gutters">
+                            <div class="col me-2">
+                                <div class="text-uppercase text-info fw-bold text-xs mb-1"><span style="color: rgb(240,27,13);">Incidencias hoy</span></div>
+                                <div class="row g-0 align-items-center">
+                                    <div class="col-auto">
+                                        <div class="text-dark fw-bold h5 mb-0 me-3"><span>{{today_count}}</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-auto"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-calendar2-check fa-2x text-gray-300">
+                                    <path d="M10.854 8.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708 0z"></path>
+                                    <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM2 2a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H2z"></path>
+                                    <path d="M2.5 4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V4z"></path>
+                                </svg></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3 mb-4">
+                <div class="card shadow border-start-warning py-2" style="background: rgba(255,255,255,0.83);color: var(--bs-black);">
+                    <div class="card-body">
+                        <div class="row align-items-center no-gutters">
+                            <div class="col me-2">
+                                <div class="text-uppercase text-warning fw-bold text-xs mb-1"><span style="color: rgb(132,86,18);">Nuevas incidencias</span></div>
+                                <div class="text-dark fw-bold h5 mb-0"><span> {{ new_incidences_since_last_logout }} </span></div>
+                            </div>
+                            <div class="col-auto"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-list-columns-reverse fa-2x text-gray-300">
+                                    <path fill-rule="evenodd" d="M0 .5A.5.5 0 0 1 .5 0h2a.5.5 0 0 1 0 1h-2A.5.5 0 0 1 0 .5Zm4 0a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1h-10A.5.5 0 0 1 4 .5Zm-4 2A.5.5 0 0 1 .5 2h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5Zm4 0a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5Zm-4 2A.5.5 0 0 1 .5 4h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5Zm4 0a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5Zm-4 2A.5.5 0 0 1 .5 6h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5Zm4 0a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 0 1h-8a.5.5 0 0 1-.5-.5Zm-4 2A.5.5 0 0 1 .5 8h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5Zm4 0a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 0 1h-8a.5.5 0 0 1-.5-.5Zm-4 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5Zm4 0a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1h-10a.5.5 0 0 1-.5-.5Zm-4 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5Zm4 0a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5Zm-4 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5Zm4 0a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5Z"></path>
+                                </svg></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" >
+            <div class="col-lg-7 col-xl-8">
+                
+        <div class="card shadow mb-4" style="background: rgba(255,255,255,0.83);">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="text-primary fw-bold m-0" style="font-size: 24px;">Incidencias al Año</h6>
+        </div>
+        <div class="card-body d-xl-flex justify-content-xl-center " >
+            <div class="chart-area" style="position: relative; width: 100%; height: 400px;">
+<div class="chart-container" id="grafico1" style="position: relative; width: 90%; height: 100%; margin: 0 auto;">
+    <canvas id="annualChart"></canvas>
+</div>
+
+<div class="chart-container" id="grafico2" style="display: none; position: relative; width: 90%; height: 100%; margin: 0 auto;">
+    <canvas id="quarterlyChart"></canvas>
+</div>
+          
+            </div>
+
+
+
+
+
+
+
+ </div>
+    </div>
+     <button id="toggleGraficos" class="btn btn-primary "  >Mostrar Gráfico Trimestral</button>
+        </div>
+       
+       
+    
+    
+    
+    
+    <div class="col-lg-5 col-xl-4">
+                <div class="card shadow mb-4" style="background: rgba(255,255,255,0.83);">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="text-primary fw-bold m-0" style="font-size: 24px;">Incidencias por tipo</h6>
+                    </div>
+                    <div class="card-body">
+                       <div class="chart-area" style="height: 400px;">
+    <canvas id="incidencesPieChart"></canvas>
+</div>
+
+
+<script src="{% static 'App/js/chart.min.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var ctx = document.getElementById('incidencesPieChart').getContext('2d');
+        var pieChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: {{ pie_chart_labels|safe }},
+                datasets: [{
+                    label: 'Incidencias por tipo',
+                    data: {{ pie_chart_data|safe }},
+                    backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
+                    borderColor: ['black', 'black', 'black'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        fontStyle: 'normal'
+                    }
+                },
+                title: {
+                    display: true,
+                    fontStyle: 'normal'
+                }
+            }
+        });
+    });
+</script>
+
+                    
+                    </div>
+                </div>
+            </div>
+    
+    
+    
+    
+    
+    
+    
+    </div>
+        <div class="row mt-5">
+            <div class="col-lg-6 mb-4">
+                <div class="card shadow mb-4" style="background: rgba(255,255,255,0.83);">
+                    <div class="card-header py-3">
+                        <h6 class="text-primary fw-bold m-0" style="font-size: 24px;">Porcentaje que representa cada Región del Total de Incidencias</h6>
+                    </div>
+                    <div class="card-body">
+                        {% for territory in territory_percentages %}
+                        <h4 class="small fw-bold text-dark">{{ territory.territory|upper }}<span class="float-end">{{ territory.percentage }}%</span></h4>
+                        <div class="progress mb-4" style="width: 100%;height: 30px;">
+                            <div class="progress-bar bg-primary" role="progressbar" aria-valuenow="{{territory.percentage}}" aria-valuemin="0" aria-valuemax="100" style="width: {{territory.percentage|floatformat:0 }}%; min-width: 5%;">
+                                <span class="">{{ territory.percentage }}%</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card shadow mb-4" style="background: rgba(255,255,255,0.83);">
+                    <div class="card-header py-3">
+                        <div class="d-sm-flex justify-content-between align-items-center mb-4">
+                            <h3 class="text-dark mb-0">Tareas Diarias</h3><a class="btn btn-primary btn-sm d-none d-sm-inline-block" role="button" href="#" data-bs-target="#modal-Tarea" data-bs-toggle="modal"><i class="far fa-calendar-check fa-sm text-white-50" style="font-size: 19px;"></i>&nbsp;Añadir Tarea</a>
+                        </div>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item" style="background: rgba(255,255,255,0.83);">
+                            <div class="row align-items-center no-gutters">
+                                <div class="col me-2">
+                                    <h6 class="mb-0"><strong>Tarea 1</strong></h6><span class="text-xs">10:30 AM</span>
+                                </div>
+                                <div class="col-auto text-center d-xl-flex justify-content-xl-end align-items-xl-center" style="width: 143.5px;">
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-1"><label class="form-check-label" for="formCheck-1"></label></div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="row align-items-center no-gutters">
+                                <div class="col me-2">
+                                    <h6 class="mb-0"><strong>Tarea 2</strong></h6><span class="text-xs">11:30 AM</span>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-2"><label class="form-check-label" for="formCheck-2"></label></div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="row align-items-center no-gutters">
+                                <div class="col me-2">
+                                    <h6 class="mb-0"><strong>Tarea 3</strong></h6><span class="text-xs">12:30 AM</span>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-3"><label class="form-check-label" for="formCheck-3"></label></div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" role="dialog" tabindex="-1" id="modal-Tarea">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Añadir Tarea</h4><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="col text-center">
+                            <div style="margin-bottom: 12px;"><input type="text" style="width: 336px;"></div>
+                            <div><input type="time" style="width: 336px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancelar</button><button class="btn btn-primary" type="button">Guardar</button></div>
+            </div>
+        </div>
+    </div>
+    </section>
+
+<script src="{% static 'App/js/chart.min.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var chartLabels = {{ chart_labels|safe }};
+        var contrarevolucionData = {{ counterrevolution_data|safe }};
+        var delictivaData = {{ criminal_activity_data|safe }};
+        var quarterLabels = {{ quarter_labels|safe }};
+        var contrarevolucionQuarterData = {{ quarter_counterrevolution_data|safe }};
+        var delictivaQuarterData = {{ quarter_criminal_activity_data|safe }};
+        
+        var annualChart;
+        var quarterlyChart;
+        
+        function createAnnualChart() {
+            var ctxYear = document.getElementById('annualChart').getContext('2d');
+            if (annualChart) {
+                annualChart.destroy();
+            }
+            annualChart = new Chart(ctxYear, {
+                type: 'line',
+                data: {
+                    labels: chartLabels,
+                    datasets: [
+                        {
+                            label: 'Contrarevolución',
+                            data: contrarevolucionData,
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            fill: true,
+                            lineTension: 0.3,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                        },
+                        {
+                            label: 'Delictiva',
+                            data: delictivaData,
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            fill: true,
+                            lineTension: 0.3,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                stepSize: 1
+                            }
+                        }]
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    },
+                    tooltips: {
+                        enabled: true
+                    }
+                }
+            });
+        }
+        
+        function createQuarterlyChart() {
+            var ctxQuarter = document.getElementById('quarterlyChart').getContext('2d');
+            if (quarterlyChart) {
+                quarterlyChart.destroy();
+            }
+            quarterlyChart = new Chart(ctxQuarter, {
+                type: 'line',
+                data: {
+                    labels: quarterLabels,
+                    datasets: [
+                        {
+                            label: 'Contrarevolución',
+                            data: contrarevolucionQuarterData,
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            fill: true,
+                            lineTension: 0.3,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                        },
+                        {
+                            label: 'Delictiva',
+                            data: delictivaQuarterData,
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            fill: true,
+                            lineTension: 0.3,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                stepSize: 1
+                            }
+                        }]
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    },
+                    tooltips: {
+                        enabled: true
+                    }
+                }
+            });
+        }
+        
+        // Initially create the annual chart and show it
+        createAnnualChart();
+        document.getElementById('grafico1').style.display = 'block';
+        document.getElementById('grafico2').style.display = 'none';
+        
+        document.getElementById('toggleGraficos').addEventListener('click', function() {
+            const grafico1 = document.getElementById('grafico1');
+            const grafico2 = document.getElementById('grafico2');
+            const boton = this;
+            
+            if (grafico1.style.display === 'none') {
+                grafico2.style.display = 'none';
+                grafico1.style.display = 'block';
+                createAnnualChart();
+                boton.textContent = 'Mostrar Gráfico Trimestral';
+            } else {
+                grafico1.style.display = 'none';
+                grafico2.style.display = 'block';
+                createQuarterlyChart();
+                boton.textContent = 'Mostrar Gráfico Anual';
+            }
+        });
+    });
+</script>
+
+
+
+    <script src="{% static 'App/assets/bootstrap/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'App/assets/js/aos.min.js' %}"></script>
+    <script src="{% static 'App/assets/js/bs-init.js' %}"></script>
+    <script src="{% static 'App/assets/js/bold-and-bright.js' %}"></script>
+    <script src="{% static 'App/assets/bootstrap/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'App/js/chart.min.js' %}"></script>
+    <script src="{% static 'App/js/creative.js' %}"></script>
+    <script src="{% static 'App/js/Simple-Slider-swiper-bundle.min.js' %}"></script>
+    <script src="{% static 'App/js/Simple-Slider.js' %}"></script>
+
+</body>
+
+</html>

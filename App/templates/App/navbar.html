@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio</title>
+    <style>
+     body {
+        position: relative; /* Necesario para que los elementos absolutos se posicionen respecto al body */
+       
+       
+        
+    }
+    
+    .messages {
+        list-style-type: none;
+        padding: 0;
+        position: absolute; /* Posiciona las notificaciones de forma absoluta */
+        top: 5px; /* Distancia desde la parte superior */
+        /* right: 20px; Distancia desde la derecha */
+        left: 50%;/*  Centra horizontalmente */
+        
+        z-index: 1000; /* Asegura que esté por encima de otros elementos */
+        
+    }
+    
+    .messages li { 
+        list-style-type: none;
+        padding: 10px;
+        margin: 5px 0;
+        border-radius: 35px;
+        box-shadow:  0 2px 4px rgba(0, 0, 0, 0.4), 
+               0 4px 8px rgba(0, 0, 0, 0.3); /* S
+        transition: transform 0.5s ease, opacity 0.5s ease; /* Agrega la transición */
+        transform: translateX(-50%);
+    }
+    
+    .success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    
+    
+    /* Clase para ocultar el mensaje */
+    .hide {
+        transform: translateX(100%) !important; /* Desliza hacia la derecha */
+        opacity: 0; /* Desvanece */
+    }
+    
+    
+    
+        .btn-toggle-gray {
+            background-color: gray; /* Cambiar a gris */
+            color: white; /* Texto blanco para contraste */
+        }
+        span{
+            font-weight: 600;
+            font-size: large;
+        }
+    </style>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'App/css/bootstrap.min.css' %}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-left">
+            <div class="dropdown">
+                <button class="btn dropbtn">Menú</button>
+                <div class="dropdown-content">
+                    <div id="menu" class="flex-shrink-0 p-3 bg-white shadow rounded" style="width: 280px; border: 1px solid #ddd; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                        <a href="{% url 'dashboard' %}" class="fs-5 fw-semibold" >Inicio</a>
+                        <a href="/" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom">
+                            
+                            
+                            
+                        </a>
+                        <ul class="list-unstyled ps-0">
+                            <li class="mb-1">
+                                <button id="button-id" class="btn btn-toggle btn-lg d-inline-flex align-items-center rounded border-0" onclick="toggleCollapse('home-collapse', this)">
+                                    Registros <span class="arrow">▼</span>
+                                </button>
+                                <div class="collapse" id="home-collapse" style="display: none;">
+                                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                                        <li><a href="{% url 'incident_list' %}" class="link-dark d-inline-flex text-decoration-none rounded">Registro</a></li>
+                                        <li><a href="{% url 'activity_table' %}"  class="link-dark d-inline-flex text-decoration-none rounded">Tabla 1</a></li>
+                                        <li><a href="{% url 'add_incidence' %}" class="link-dark d-inline-flex text-decoration-none rounded">Nueva Incidencia</a></li>
+                                        
+                                        
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="mb-1">
+                                <button id="button-id" class="btn btn-toggle btn-lg d-inline-flex align-items-center rounded border-0" onclick="toggleCollapse('dashboard-collapse', this)">
+                                    Otras Opciones<span class="arrow">▼</span>
+                                </button>
+                                <div class="collapse" id="dashboard-collapse" style="display: none;">
+                                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                                        <li><a href="{% url 'list_users' %}" class="link-dark d-inline-flex text-decoration-none rounded"> Listado Usuarios</a></li>
+                                        <li><a href="{% url 'generate_report' %}" class="link-dark d-inline-flex text-decoration-none rounded">parte</a></li>
+                                        <li><a href="#" class="link-dark d-inline-flex text-decoration-none rounded">Monthly</a></li>
+                                        <li><a href="#" class="link-dark d-inline-flex text-decoration-none rounded">Annually</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="mb-1">
+                                <button id="button-id" class="btn btn-toggle btn-lg d-inline-flex align-items-center rounded border-0" onclick="toggleCollapse('orders-collapse', this)">
+                                   Otros <span class="arrow">▼</span>
+                                </button>
+                                <div class="collapse" id="orders-collapse" style="display: none;">
+                                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                                        <li><a href="" class="link-dark d-inline-flex text-decoration-none rounded">Curva de talla</a></li>
+                                        <li><a href="#" class="link-dark d-inline-flex text-decoration-none rounded">Processed</a></li>
+                                        <li><a href="#" class="link-dark d-inline-flex text-decoration-none rounded">Shipped</a></li>
+                                        <li><a href="#" class="link-dark d-inline-flex text-decoration-none rounded">Returned</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="border-top my-3"></li>
+                            <li class="mb-1">
+                                <button  id="button-id" class="btn btn-toggle btn-lg d-inline-flex align-items-center rounded border-0" onclick="toggleCollapse('account-collapse', this)">
+                                    Account <span class="arrow">▼</span>
+                                </button>
+                                <div class="collapse" id="account-collapse" style="display: none;">
+                                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                                        <li><a href="" class="link-dark d-inline-flex text-decoration-none rounded">Cargos</a></li>
+                                        <li><a href="#" class="link-dark d-inline-flex text-decoration-none rounded">Profile</a></li>
+                                        <li><a href="#" class="link-dark d-inline-flex text-decoration-none rounded">Settings</a></li>
+                                        <li><a href="#" class="link-dark d-inline-flex text-decoration-none rounded">Sign out</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="navbar-center">
+            <h1>Tarea Inteligencia</h1>
+        </div>
+        <div class="navbar-right">
+            {% if request.user.is_authenticated %}
+            <form action="{% url 'logout' %}" method="post">
+           {% csrf_token %}
+           <span> @{{ user.username }}/ {{user.role}} </span>
+            <button class=" btn login-button" type="submit">Cerrar sesión</button>
+           </form> 
+           {% else %}
+           
+           <a href="{% url 'login' %}" class="btn login-button" >Iniciar Sesión</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <style>
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #2C3E50;
+            padding: 10px;
+            color: white;
+        }
+        .navbar-left {
+            position: relative;
+        }
+        .dropdown {
+            
+            display: inline-block;
+        }
+        .dropbtn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            z-index: 1;
+        }
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .navbar-center {
+            flex-grow: 1;
+            text-align: center;
+        }
+        .login-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+        .active {
+            background-color: rgba(76, 175, 80, 0.5); /* Verde semitransparente */
+        }
+        .btn-toggle {
+            transition: background-color 0.3s; /* Transición suave */
+            color: black; /* Asegura que el texto sea visible */
+            display: block; /* Asegura que el botón siempre esté en bloque */
+            
+        }
+        .btn-toggle:hover {
+            background-color: rgba(76, 175, 80, 0.3); /* Color de fondo en hover */
+        }
+        /* Nuevo estilo para botón activo */
+        .btn-toggle.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+
+    <script>
+        function toggleCollapse(collapseId, button) {
+            const boton = document.getElementById('button-id')
+            const collapseElement = document.getElementById(collapseId);
+            const arrow = button.querySelector('.arrow');
+
+            // Cerrar otros colapsables y desmarcar otros botones
+            document.querySelectorAll('.collapse').forEach(collapse => {
+                if (collapse.id !== collapseId) {
+                    collapse.style.display = 'none';
+                }
+            });
+            document.querySelectorAll('.btn-toggle').forEach(btn => {
+                if (btn !== button) {
+                    btn.classList.remove('active');
+                    const btnArrow = btn.querySelector('.arrow');
+                    if (btnArrow) btnArrow.innerHTML = '▼';
+                }
+            });
+
+            // Alternar la visibilidad del contenido actual
+            if (collapseElement.style.display === 'block') {
+                collapseElement.style.display = 'none'; // Ocultar el contenido
+                arrow.innerHTML = '▼'; // Cambiar a flecha hacia abajo
+                boton.style.display = 'block';
+                button.classList.remove('active');
+            } else {
+                collapseElement.style.display = 'block'; // Mostrar el contenido
+                arrow.innerHTML = '▲'; // Cambiar a flecha hacia arriba
+                boton.style.display = 'block';
+                button.classList.add('active');
+            }
+        }
+
+        // Inicializar los elementos colapsados
+        document.querySelectorAll('.collapse').forEach(collapse => {
+            collapse.style.display = 'none'; // Ocultar inicialmente
+        });
+
+        // Añadir funcionalidad para marcar botón activo
+        document.querySelectorAll('.btn-toggle').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.btn-toggle').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+            });
+        });
+    </script>
+
+     {% if messages %}
+       <div class="notification text-center">
+           <ul class="messages " data-aos="fade-down" data-aos-duration="1600">
+               {% for message in messages %}
+                   <li{% if message.tags %} class="{{ message.tags }}"{% endif %}> 
+                       {% if message.tags == 'success' %}
+                       <svg xmlns="http://www.w3.org/2000/svg" width="25px" height="25px" viewBox="0 0 24 24" fill="none" stroke="green" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 6L9 17l-5-5"/>
+                       </svg>
+                       {{ message }}
+
+                       {% elif message.tags == 'error' %}
+                       <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="6" y1="18" x2="18" y2="6"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                       </svg>
+                     {{ message }}
+                     
+                       {% else %}
+                           {{ message }}
+                       {% endif %}
+                   </li>
+               {% endfor %}
+           </ul>
+       </div>
+   {% endif %}
+
+    <script src="{% static 'App/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'App/js/aos.min.js' %}"></script>
+    <script src="{% static 'App/js/bs-init.js' %}"></script>
+    <script src="{% static 'App/js/baguetteBox.min.js' %}"></script>
+    <script src="{% static 'App/js/creative.js' %}"></script>
+
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const messages = document.querySelectorAll('.messages li');
+        
+        messages.forEach((message) => {
+            setTimeout(() => {
+                message.classList.add('hide'); // Agrega la clase para ocultar
+            }, 3000); // Espera 3 segundos antes de ocultar
+            
+            // Opcional: Eliminar el elemento del DOM después de la animación
+            message.addEventListener('transitionend', () => {
+                message.remove();
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

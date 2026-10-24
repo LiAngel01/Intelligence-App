@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de Incidencias</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'App/css/bootstrap.min.css' %}">
+</head>
+<style>
+    span{
+            
+            font-weight: 400;
+        }
+</style>
+ {% if messages %}
+       <div class="notification text-center">
+           <ul class="messages " data-aos="fade-down" data-aos-duration="1600">
+               {% for message in messages %}
+                   <li{% if message.tags %} class="{{ message.tags }}"{% endif %}> 
+                       {% if message.tags == 'success' %}
+                       <svg xmlns="http://www.w3.org/2000/svg" width="25px" height="25px" viewBox="0 0 24 24" fill="none" stroke="green" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 6L9 17l-5-5"/>
+                       </svg>
+                       {{ message }}
+
+                       {% elif message.tags == 'error' %}
+                       <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="6" y1="18" x2="18" y2="6"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                       </svg>
+                     {{ message }}
+                     
+                       {% else %}
+                           {{ message }}
+                       {% endif %}
+                   </li>
+               {% endfor %}
+           </ul>
+       </div>
+   {% endif %}
+ <style>
+    body {
+        position: relative; /* Necesario para que los elementos absolutos se posicionen respecto al body */
+       
+       
+        
+    }
+    
+    .messages {
+        list-style-type: none;
+        padding: 0;
+        position: absolute; /* Posiciona las notificaciones de forma absoluta */
+        top: 5px; /* Distancia desde la parte superior */
+        /* right: 20px; Distancia desde la derecha */
+        left: 50%;/*  Centra horizontalmente */
+        
+        z-index: 1000; /* Asegura que esté por encima de otros elementos */
+        
+    }
+    
+    .messages li { 
+        list-style-type: none;
+        padding: 10px;
+        margin: 5px 0;
+        border-radius: 35px;
+        box-shadow:  0 2px 4px rgba(0, 0, 0, 0.4), 
+               0 4px 8px rgba(0, 0, 0, 0.3); /* S
+        transition: transform 0.5s ease, opacity 0.5s ease; /* Agrega la transición */
+        transform: translateX(-50%);
+    }
+    
+    .success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    
+    
+    /* Clase para ocultar el mensaje */
+    .hide {
+        transform: translateX(100%) !important; /* Desliza hacia la derecha */
+        opacity: 0; /* Desvanece */
+    }
+    option{
+        background-color: #1e1f1f;
+    }
+    .form-control{
+    background-color: rgba(87, 87, 87,  0.4) !important;
+    color: aliceblue !important;
+    font-weight: 500;
+   }
+ </style>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const messages = document.querySelectorAll('.messages li');
+        
+        messages.forEach((message) => {
+            setTimeout(() => {
+                message.classList.add('hide'); // Agrega la clase para ocultar
+            }, 3000); // Espera 3 segundos antes de ocultar
+            
+            // Opcional: Eliminar el elemento del DOM después de la animación
+            message.addEventListener('transitionend', () => {
+                message.remove();
+            });
+        });
+    });
+</script>
+<body class="text-light" style="background: url({% static 'App/img/fondo.jpg' %}) center / cover no-repeat;background-attachment: fixed;">
+    <nav class="navbar navbar-light navbar-expand-md py-3">
+        <div class="container">
+            <a class="navbar-brand text-light" href="{% url 'dashboard' %}">Inicio</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample02" aria-controls="navbarsExample02" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarsExample02">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link text-light" aria-current="page" href="{% url 'list_users' %}">Usuarios</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-light" href="{% url 'incident_list' %}">Registro</a>
+          </li>
+        </ul>
+        
+      </div><div class="text-light">
+            {% if request.user.is_authenticated %}
+            <form action="{% url 'logout' %}" method="post">
+           {% csrf_token %}
+           <span> @{{ user.username }}/ {{user.role}} </span>
+            <button class=" btn btn-primary" type="submit">Cerrar sesión</button>
+           </form> 
+           {% else %}
+           
+           <a href="{% url 'login' %}" class="btn btn-primary" >Iniciar Sesión</a>
+            {% endif %}
+        </div>
+            </div>
+        </div>
+    </nav>
+    <div class=" mt-4 mx-auto"  style="width: 95%;" >
+        <h1>Listado de Incidencias</h1>
+        <div class="row">
+        <div class="col-6"> <form method="get"> 
+            <div class="row">
+                 <p>Filtrado por rango de fechas</p> 
+    <div class="col-4">
+            <div>Fecha inicial</div>
+            <div style="display: inline-flex; align-items: center;">
+                <input type="date" id="fecha_incidencia_start" name="fecha_incidencia_start" value="{{ request.GET.fecha_incidencia_start }}" class="form-control form-control-sm" style="width: 80%;" placeholder="Fecha inicio">
+                <button type="button" class="btn border text-light btn-sm btn-outline-secondary ms-1" onclick="document.getElementById('fecha_incidencia_start').value = '';">X</button>
+            </div></div>
+
+            <div class="col-4">
+                <div>Fecha final</div>
+            <div style="display: inline-flex; align-items: center; ">
+                <input type="date" id="fecha_incidencia_end" name="fecha_incidencia_end" value="{{ request.GET.fecha_incidencia_end }}" class="form-control form-control-sm" style="width: 80%;" placeholder="Fecha fin">
+                <button type="button" class="btn border text-light btn-sm btn-outline-secondary ms-1" onclick="document.getElementById('fecha_incidencia_end').value = '';">X</button>
+            </div></div> 
+
+    <div class="col-4"></div>
+        </div>
+            
+            
+            
+                     </div>
+        <div class="col-6 text-end"><a href="{% url 'add_incidence' %}" class="btn btn-primary " style="" >  Agregar Incidencia</a></div>
+    </div>
+        
+        <table class="table text-light "  >
+            <thead>
+                <tr>
+                    <th>
+                         Fecha Incidencia
+                     </th>
+                    <th>
+                      <!--   <input type="datetime-local" name="created_at" value="{{ filters.created_at }}" class="form-control form-control-sm" placeholder="Filtrar">
+                      -->Fecha Registro
+                     </th>
+                    <th>
+                       Quien informa <select name="informant" class="form-control form-control-sm">
+                            <option value="">Todos</option>
+                            {% for value, display in informante_choices %}
+                                <option value="{{ value }}" {% if request.GET.informant == value %}selected{% endif %}>{{ display }}</option>
+                            {% endfor %}
+                        </select>
+                    </th>
+                    <th>
+                       Tipo Actividad <select name="activity_type" class="form-control form-control-sm">
+                            <option value="">Todos</option>
+                            {% for value, display in tipo_actividad_choices %}
+                                <option value="{{ value }}" {% if request.GET.activity_type == value %}selected{% endif %}>{{ display }}</option>
+                            {% endfor %}
+                        </select>
+                    </th>
+                    <th>
+                       Actividad     <input type="search" name="activities" value="{{ request.GET.activities }}" class="form-control form-control-sm" placeholder="Todos">
+                    
+                    </th>
+                    <th>
+                       Territorio <select name="territory" class="form-control form-control-sm">
+                            <option value="">Todos</option>
+                            {% for value, display in territorio_choices %}
+                                <option value="{{ value }}" {% if request.GET.territory == value %}selected{% endif %}>{{ display }}</option>
+                            {% endfor %}
+                        </select>
+                    </th>
+                    <th>
+                       Municipio 
+                             <input type="search" name="municipality" value="{{ request.GET.municipality }}" class="form-control form-control-sm" placeholder="Todos">
+                    </th>
+                    <th>
+                       Implicado     <input type="search" name="involved_parties" value="{{ request.GET.involved_parties }}" class="form-control form-control-sm" placeholder="Todos">
+                    
+                    </th>
+                    
+                    <th style="width: 180px;" >Acciones <br><input style="width: 35%;" type="submit" value="Filtrar" class=" btn btn-sm border btn-primary form-control ">  <div class="btn btn-sm border text-light " style="height: 30px;" > <span>Total: {{total_count}} </span></div>  </th>
+                </tr>
+            </thead>
+            <tbody  style="background-color: rgba(71, 71, 71, 0.3);"    >
+                {% for incident in incidents %}
+                <tr>
+                    <td>{{ incident.incident_date }}</td>
+                    <td>{{ incident.created_at }}</td>
+                    <td>{{ incident.informant }}</td>
+                    <td>{{ incident.activity_type }}</td>
+                    <td>{{ incident.activities }}</td>
+                    <td>{{ incident.territory }}</td>
+                    <td>{{ incident.imagen }} 
+                        {% if incident.municipality %}
+                        {{ incident.municipality }} 
+                        {% else %} 
+                        -
+                        {% endif %}
+                    </td>
+                    <td>{{ incident.involved_parties }}</td>
+                    
+                    <td>
+                        <a href="{% url 'edit_incident' incident.id %}" style="width: 35%;" class="btn btn-primary btn-sm">Editar</a>
+                        <a href="{% url 'delete_incident' incident.id %}" style="width: 60%;" class="btn btn-danger btn-sm">Eliminar</a>
+                        <a href="{% url 'incident_detail' incident.id %}"  class="btn btn-secondary btn-sm mt-1 w-100 ">Ver más</a>
+                    </td>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8">No hay incidencias registradas.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
